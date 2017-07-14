@@ -24,7 +24,6 @@ casper.then(function () {
 // FILL USERNAME AND PASSWORD
 casper.waitUntilVisible('#ss-login-form')
 casper.wait(8000, function () {
-  this.echo('opened login form, filling')
   this.fillSelectors('#ss-login-form', {
     '#ss-email-input': username,
     '#ss-password-login': password
