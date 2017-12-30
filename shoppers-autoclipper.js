@@ -33,17 +33,22 @@ casper.wait(20000) // TODO how to tell when login complete
 casper.waitWhileVisible('.coupon-spinner', function onCouponsLoaded () {
   casper.capture('screenshots/04-coupons-loaded.jpg')
   this.evaluate(function () {
-    var clip = CouponHelper.couponAddToCard
-    function getUnclippedCoupons () {
+    function clip (id) {
+      return $.post('/services/newcoupons', {
+        'couponId': coupon.id
+      })
+    }
+    function getUnclippedCouponIDs () {
       // requesting page number 0 returns all coupons in a single page
       return $.getJSON('https://www.shoppersfood.com/services/couponlist?category=All&currentPageNumber=0').then(function (data) {
         return data.coupons
           .filter(function (c) { return !c.onCard })
+          .map(function (c) { return c.id })
       })
     }
     function clipAll () {
-      return getUnclippedCoupons().then(function (coupons) {
-        const queue = coupons.map(function (coupon) { return clip.bind(null, coupon) })
+      return getUnclippedCouponIDs().then(function (ids) {
+        const queue = ids.map(function (id) { return clip.bind(null, id) })
         return queue.reduce(function (prev, cur) { return prev.then(cur) }, $.Deferred().resolve())
       })
     }
